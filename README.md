@@ -1,5 +1,6 @@
 # Multi-Area OSPFv2 Lab in GNS3
 
+
 ## Overview
 
 This project implements a multi-area OSPFv2 topology in GNS3 using three Cisco IOS routers and three LAN segments.
@@ -19,7 +20,7 @@ The project demonstrates:
 
 ## Topology
 
-![Multi-Area OSPF GNS3 Topology](topology/topology.png)
+![Multi-Area OSPFv2 topology showing Area 0 and Areas 10, 20, and 30](topology/topology.png)
 
 ## Devices
 
