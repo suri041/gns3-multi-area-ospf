@@ -1,0 +1,360 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2026.09.04 12:34:13 =~=~=~=~=~=~=~=~=~=~=~=
+
+% Password:  timeout expired!
+Password: 
+BLR-R2#sh ip int brief
+Interface              IP-Address      OK? Method Status                Protocol
+FastEthernet0/0        192.168.20.1    YES NVRAM  up                    up      
+Serial1/0              10.10.10.2      YES NVRAM  up                    up      
+Serial1/1              20.20.20.1      YES NVRAM  up                    up      
+Serial1/2              unassigned      YES NVRAM  administratively down down    
+Serial1/3              unassigned      YES NVRAM  administratively down down    
+BLR-R2#h   sh run
+Building configuration...
+
+Current configuration : 1498 bytes
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname BLR-R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 <PASSWORD>
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+ --More--         no ip domain lookup
+ip domain name cisco.com
+ip cef
+login block-for 180 attempts 3 within 10
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+username cisco password 0 <PASSWORD>
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+ip ssh version 2
+ --More--         ! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.20.1 255.255.255.0
+ duplex full
+!
+interface Serial1/0
+ ip address 10.10.10.2 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/1
+ ip address 20.20.20.1 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/2
+ no ip address
+ --More--          shutdown
+ serial restart-delay 0
+!
+interface Serial1/3
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+router ospf 1
+ router-id 1.1.2.2
+ network 10.10.10.0 0.0.0.3 area 0
+ network 20.20.20.0 0.0.0.3 area 0
+ network 192.168.20.0 0.0.0.255 area 20
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+ --More--         !
+control-plane
+!
+!
+line con 0
+ exec-timeout 3 0
+ privilege level 15
+ password <PASSWORD>
+ logging synchronous
+ login
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ exec-timeout 3 0
+ password <PASSWORD>
+ logging synchronous
+ login
+line vty 5 15
+ exec-timeout 3 0
+ --More--          password <PASSWORD>
+ logging synchronous
+ login
+!
+!
+end
+
+BLR-R2#dh    sh ip int brief
+Interface              IP-Address      OK? Method Status                Protocol
+FastEthernet0/0        192.168.20.1    YES NVRAM  up                    up      
+Serial1/0              10.10.10.2      YES NVRAM  up                    up      
+Serial1/1              20.20.20.1      YES NVRAM  up                    up      
+Serial1/2              unassigned      YES NVRAM  administratively down down    
+Serial1/3              unassigned      YES NVRAM  administratively down down    
+BLR-R2#sh ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       + - replicated route, % - next hop override
+
+Gateway of last resort is not set
+
+      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        10.10.10.0/30 is directly connected, Serial1/0
+L        10.10.10.2/32 is directly connected, Serial1/0
+      20.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        20.20.20.0/30 is directly connected, Serial1/1
+L        20.20.20.1/32 is directly connected, Serial1/1
+O IA  192.168.10.0/24 [110/65] via 10.10.10.1, 00:05:17, Serial1/0
+      192.168.20.0/24 is variably subnetted, 2 subnets, 2 masks
+C        192.168.20.0/24 is directly connected, FastEthernet0/0
+L        192.168.20.1/32 is directly connected, FastEthernet0/0
+O IA  192.168.30.0/24 [110/65] via 20.20.20.2, 00:05:11, Serial1/1
+BLR-R2#sh ip ospf
+ Routing Process "ospf 1" with ID 1.1.2.2
+ Start time: 00:00:16.860, Time elapsed: 00:05:33.032
+ Supports only single TOS(TOS0) routes
+ Supports opaque LSA
+ Supports Link-local Signaling (LLS)
+ Supports area transit capability
+ Supports NSSA (compatible with RFC 3101)
+ Event-log enabled, Maximum number of events: 1000, Mode: cyclic
+ It is an area border router
+ Router is not originating router-LSAs with maximum metric
+ Initial SPF schedule delay 5000 msecs
+ Minimum hold time between two consecutive SPFs 10000 msecs
+ Maximum wait time between two consecutive SPFs 10000 msecs
+ Incremental-SPF disabled
+ Minimum LSA interval 5 secs
+ Minimum LSA arrival 1000 msecs
+ LSA group pacing timer 240 secs
+ Interface flood pacing timer 33 msecs
+ Retransmission pacing timer 66 msecs
+ Number of external LSA 0. Checksum Sum 0x000000
+ Number of opaque AS LSA 0. Checksum Sum 0x000000
+ Number of DCbitless external and opaque AS LSA 0
+ Number of DoNotAge external and opaque AS LSA 0
+ --More--          Number of areas in this router is 2. 2 normal 0 stub 0 nssa
+ Number of areas transit capable is 0
+ External flood list length 0
+ IETF NSF helper support enabled
+ Cisco NSF helper support enabled
+ Reference bandwidth unit is 100 mbps
+    Area BACKBONE(0)
+        Number of interfaces in this area is 2
+	Area has no authentication
+	SPF algorithm last executed 00:05:16.676 ago
+	SPF algorithm executed 3 times
+	Area ranges are
+	Number of LSA 6. Checksum Sum 0x02A22F
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 0
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+    Area 20
+        Number of interfaces in this area is 1
+	Area has no authentication
+	SPF algorithm last executed 00:05:21.684 ago
+	SPF algorithm executed 2 times
+ --More--         	Area ranges are
+	Number of LSA 5. Checksum Sum 0x03E846
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 0
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+
+BLR-R2#sh ip ospf neighbor
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+1.1.3.3           0   FULL/  -        00:00:26    20.20.20.2      Serial1/1
+1.1.1.1           0   FULL/  -        00:00:31    10.10.10.1      Serial1/0
+BLR-R2#sh il p osps  pf database
+
+            OSPF Router with ID (1.1.2.2) (Process ID 1)
+
+		Router Link States (Area 0)
+
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+1.1.1.1         1.1.1.1         349         0x80000002 0x00B3A6 2
+1.1.2.2         1.1.2.2         343         0x80000002 0x001F1B 4
+1.1.3.3         1.1.3.3         338         0x80000002 0x0041D3 2
+
+		Summary Net Link States (Area 0)
+
+Link ID         ADV Router      Age         Seq#       Checksum
+192.168.10.0    1.1.1.1         345         0x80000001 0x00556F
+192.168.20.0    1.1.2.2         338         0x80000001 0x00D9DE
+192.168.30.0    1.1.3.3         333         0x80000001 0x005E4E
+
+		Router Link States (Area 20)
+
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+1.1.2.2         1.1.2.2         348         0x80000001 0x00CED8 1
+
+		Summary Net Link States (Area 20)
+ --More--         
+Link ID         ADV Router      Age         Seq#       Checksum
+10.10.10.0      1.1.2.2         338         0x80000001 0x006576
+20.20.20.0      1.1.2.2         338         0x80000001 0x00FBC1
+192.168.10.0    1.1.2.2         338         0x80000001 0x00CAB7
+192.168.30.0    1.1.2.2         332         0x80000001 0x00ED80
+BLR-R2#sh ip ospf int 
+Serial1/1 is up, line protocol is up 
+  Internet Address 20.20.20.1/30, Area 0, Attached via Network Statement
+  Process ID 1, Router ID 1.1.2.2, Network Type POINT_TO_POINT, Cost: 64
+  Topology-MTID    Cost    Disabled    Shutdown      Topology Name
+        0           64        no          no            Base
+  Transmit Delay is 1 sec, State POINT_TO_POINT
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    oob-resync timeout 40
+    Hello due in 00:00:02
+  Supports Link-local Signaling (LLS)
+  Cisco NSF helper support enabled
+  IETF NSF helper support enabled
+  Index 2/2, flood queue length 0
+  Next 0x0(0)/0x0(0)
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 4 msec
+  Neighbor Count is 1, Adjacent neighbor count is 1 
+    Adjacent with neighbor 1.1.3.3
+  Suppress hello for 0 neighbor(s)
+Serial1/0 is up, line protocol is up 
+  Internet Address 10.10.10.2/30, Area 0, Attached via Network Statement
+  Process ID 1, Router ID 1.1.2.2, Network Type POINT_TO_POINT, Cost: 64
+  Topology-MTID    Cost    Disabled    Shutdown      Topology Name
+ --More--                 0           64        no          no            Base
+  Transmit Delay is 1 sec, State POINT_TO_POINT
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    oob-resync timeout 40
+    Hello due in 00:00:05
+  Supports Link-local Signaling (LLS)
+  Cisco NSF helper support enabled
+  IETF NSF helper support enabled
+  Index 1/1, flood queue length 0
+  Next 0x0(0)/0x0(0)
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 0 msec
+  Neighbor Count is 1, Adjacent neighbor count is 1 
+    Adjacent with neighbor 1.1.1.1
+  Suppress hello for 0 neighbor(s)
+FastEthernet0/0 is up, line protocol is up 
+  Internet Address 192.168.20.1/24, Area 20, Attached via Network Statement
+  Process ID 1, Router ID 1.1.2.2, Network Type BROADCAST, Cost: 1
+  Topology-MTID    Cost    Disabled    Shutdown      Topology Name
+        0           1         no          no            Base
+  Transmit Delay is 1 sec, State DR, Priority 1
+  Designated Router (ID) 1.1.2.2, Interface address 192.168.20.1
+  No backup designated router on this network
+ --More--           Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    oob-resync timeout 40
+    Hello due in 00:00:05
+  Supports Link-local Signaling (LLS)
+  Cisco NSF helper support enabled
+  IETF NSF helper support enabled
+  Index 1/3, flood queue length 0
+  Next 0x0(0)/0x0(0)
+  Last flood scan length is 0, maximum is 0
+  Last flood scan time is 0 msec, maximum is 0 msec
+  Neighbor Count is 0, Adjacent neighbor count is 0 
+  Suppress hello for 0 neighbor(s)
+BLR-R2#sh ip protocol
+*** IP Routing is NSF aware ***
+
+Routing Protocol is "ospf 1"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  Router ID 1.1.2.2
+  It is an area border router
+  Number of areas in this router is 2. 2 normal 0 stub 0 nssa
+  Maximum path: 4
+  Routing for Networks:
+    10.10.10.0 0.0.0.3 area 0
+    20.20.20.0 0.0.0.3 area 0
+    192.168.20.0 0.0.0.255 area 20
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    1.1.3.3              110      00:06:22
+    1.1.1.1              110      00:06:29
+  Distance: (default is 110)
+
+BLR-R2#ping 192.168      0.0 10.10.0 1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.10.10.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 28/32/52 ms
+BLR-R2#ping 10.10.10.10.1 20.10.20.1 20.20.10.20.20.1 20.20.20.10.20.20.1   2
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 20.20.20.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 24/27/28 ms
+BLR-R2#ping 192.168.10.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.10.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 16/28/36 ms
+BLR-R2#ping 192.168.10.10.1 20.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.20.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+BLR-R2#ping 192.168.20.120.1 30.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.30.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 24/28/36 ms
+BLR-R2#

@@ -1,0 +1,349 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2026.09.04 12:37:43 =~=~=~=~=~=~=~=~=~=~=~=
+h sh un  run
+Building configuration...
+
+Current configuration : 1422 bytes
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname CHN-R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password <PASSWORD>
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+ --More--         no ip domain lookup
+ip domain name cisco.com
+ip cef
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+username cisco password 0 <PASSWORD>
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+ip ssh version 2
+! 
+ --More--         !
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.30.1 255.255.255.0
+ duplex full
+!
+interface Serial1/0
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+interface Serial1/1
+ ip address 20.20.20.2 255.255.255.252
+ serial restart-delay 0
+!
+interface Serial1/2
+ no ip address
+ --More--          shutdown
+ serial restart-delay 0
+!
+interface Serial1/3
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+router ospf 1
+ router-id 1.1.3.3
+ network 20.20.20.0 0.0.0.3 area 0
+ network 192.168.30.0 0.0.0.255 area 30
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+ --More--         !
+!
+line con 0
+ exec-timeout 3 0
+ privilege level 15
+ password <PASSWORD>
+ logging synchronous
+ login
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ exec-timeout 3 0
+ password <PASSWORD>
+ logging synchronous
+ login
+ transport input ssh
+line vty 5 15
+ exec-timeout 3 0
+ password <PASSWORD>
+ --More--          logging synchronous
+ login
+ transport input ssh
+!
+!
+end
+
+CHN-R3#sh ip int brief
+Interface              IP-Address      OK? Method Status                Protocol
+FastEthernet0/0        192.168.30.1    YES NVRAM  up                    up      
+Serial1/0              unassigned      YES NVRAM  administratively down down    
+Serial1/1              20.20.20.2      YES NVRAM  up                    up      
+Serial1/2              unassigned      YES NVRAM  administratively down down    
+Serial1/3              unassigned      YES NVRAM  administratively down down    
+CHN-R3#sh ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       + - replicated route, % - next hop override
+
+Gateway of last resort is not set
+
+      10.0.0.0/30 is subnetted, 1 subnets
+O        10.10.10.0 [110/128] via 20.20.20.1, 00:06:46, Serial1/1
+      20.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        20.20.20.0/30 is directly connected, Serial1/1
+L        20.20.20.2/32 is directly connected, Serial1/1
+O IA  192.168.10.0/24 [110/129] via 20.20.20.1, 00:06:46, Serial1/1
+O IA  192.168.20.0/24 [110/65] via 20.20.20.1, 00:06:46, Serial1/1
+      192.168.30.0/24 is variably subnetted, 2 subnets, 2 masks
+C        192.168.30.0/24 is directly connected, FastEthernet0/0
+L        192.168.30.1/32 is directly connected, FastEthernet0/0
+CHN-R3#sh ip ospf
+ Routing Process "ospf 1" with ID 1.1.3.3
+ Start time: 00:00:17.708, Time elapsed: 00:07:02.772
+ Supports only single TOS(TOS0) routes
+ Supports opaque LSA
+ Supports Link-local Signaling (LLS)
+ Supports area transit capability
+ Supports NSSA (compatible with RFC 3101)
+ Event-log enabled, Maximum number of events: 1000, Mode: cyclic
+ It is an area border router
+ Router is not originating router-LSAs with maximum metric
+ Initial SPF schedule delay 5000 msecs
+ Minimum hold time between two consecutive SPFs 10000 msecs
+ Maximum wait time between two consecutive SPFs 10000 msecs
+ Incremental-SPF disabled
+ Minimum LSA interval 5 secs
+ Minimum LSA arrival 1000 msecs
+ LSA group pacing timer 240 secs
+ Interface flood pacing timer 33 msecs
+ Retransmission pacing timer 66 msecs
+ Number of external LSA 0. Checksum Sum 0x000000
+ Number of opaque AS LSA 0. Checksum Sum 0x000000
+ Number of DCbitless external and opaque AS LSA 0
+ Number of DoNotAge external and opaque AS LSA 0
+ --More--          Number of areas in this router is 2. 2 normal 0 stub 0 nssa
+ Number of areas transit capable is 0
+ External flood list length 0
+ IETF NSF helper support enabled
+ Cisco NSF helper support enabled
+ Reference bandwidth unit is 100 mbps
+    Area BACKBONE(0)
+        Number of interfaces in this area is 1
+	Area has no authentication
+	SPF algorithm last executed 00:06:51.376 ago
+	SPF algorithm executed 2 times
+	Area ranges are
+	Number of LSA 6. Checksum Sum 0x02A22F
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 0
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+    Area 30
+        Number of interfaces in this area is 1
+	Area has no authentication
+	SPF algorithm last executed 00:06:51.380 ago
+	SPF algorithm executed 2 times
+ --More--         	Area ranges are
+	Number of LSA 5. Checksum Sum 0x026142
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 0
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+
+CHN-R3#  sh ip ospf int
+Serial1/1 is up, line protocol is up 
+  Internet Address 20.20.20.2/30, Area 0, Attached via Network Statement
+  Process ID 1, Router ID 1.1.3.3, Network Type POINT_TO_POINT, Cost: 64
+  Topology-MTID    Cost    Disabled    Shutdown      Topology Name
+        0           64        no          no            Base
+  Transmit Delay is 1 sec, State POINT_TO_POINT
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    oob-resync timeout 40
+    Hello due in 00:00:00
+  Supports Link-local Signaling (LLS)
+  Cisco NSF helper support enabled
+  IETF NSF helper support enabled
+  Index 1/1, flood queue length 0
+  Next 0x0(0)/0x0(0)
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 0 msec
+  Neighbor Count is 1, Adjacent neighbor count is 1 
+    Adjacent with neighbor 1.1.2.2
+  Suppress hello for 0 neighbor(s)
+FastEthernet0/0 is up, line protocol is up 
+  Internet Address 192.168.30.1/24, Area 30, Attached via Network Statement
+  Process ID 1, Router ID 1.1.3.3, Network Type BROADCAST, Cost: 1
+  Topology-MTID    Cost    Disabled    Shutdown      Topology Name
+ --More--                 0           1         no          no            Base
+  Transmit Delay is 1 sec, State DR, Priority 1
+  Designated Router (ID) 1.1.3.3, Interface address 192.168.30.1
+  No backup designated router on this network
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    oob-resync timeout 40
+    Hello due in 00:00:09
+  Supports Link-local Signaling (LLS)
+  Cisco NSF helper support enabled
+  IETF NSF helper support enabled
+  Index 1/2, flood queue length 0
+  Next 0x0(0)/0x0(0)
+  Last flood scan length is 0, maximum is 0
+  Last flood scan time is 0 msec, maximum is 0 msec
+  Neighbor Count is 0, Adjacent neighbor count is 0 
+  Suppress hello for 0 neighbor(s)
+CHN-R3#sh ip ospf neigh
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+1.1.2.2           0   FULL/  -        00:00:38    20.20.20.1      Serial1/1
+CHN-R3#sh ip sopf      ospf dayta   tabase
+
+            OSPF Router with ID (1.1.3.3) (Process ID 1)
+
+		Router Link States (Area 0)
+
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+1.1.1.1         1.1.1.1         455         0x80000002 0x00B3A6 2
+1.1.2.2         1.1.2.2         448         0x80000002 0x001F1B 4
+1.1.3.3         1.1.3.3         442         0x80000002 0x0041D3 2
+
+		Summary Net Link States (Area 0)
+
+Link ID         ADV Router      Age         Seq#       Checksum
+192.168.10.0    1.1.1.1         451         0x80000001 0x00556F
+192.168.20.0    1.1.2.2         445         0x80000001 0x00D9DE
+192.168.30.0    1.1.3.3         438         0x80000001 0x005E4E
+
+		Router Link States (Area 30)
+
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+1.1.3.3         1.1.3.3         447         0x80000001 0x000792 1
+
+		Summary Net Link States (Area 30)
+ --More--         
+Link ID         ADV Router      Age         Seq#       Checksum
+10.10.10.0      1.1.3.3         438         0x80000001 0x00DABE
+20.20.20.0      1.1.3.3         438         0x80000001 0x00EECC
+192.168.10.0    1.1.3.3         438         0x80000001 0x0040FF
+192.168.20.0    1.1.3.3         438         0x80000001 0x004F27
+CHN-R3#sh ip               ping 10.10.10.
+% Unrecognized host or address, or protocol not running.
+
+CHN-R3#ping 10.10.10.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.10.10.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 52/69/108 ms
+CHN-R3#ping 18 92.168.1- 0.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.10.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 20/52/96 ms
+CHN-R3#ping 192.168.10.10.1 20.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.20.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 24/30/36 ms
+CHN-R3#ping 192.168.20.10.1 30.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.30.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+CHN-R3#exit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHN-R3 con0 is now available
+
+
+
+
+
+Press RETURN to get started.
+
+
